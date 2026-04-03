@@ -5,8 +5,7 @@ const connectDB = require('./config/db');
 
 const app = express();
 
-// Connect DB
-connectDB();
+// Connect DB - Removed duplicate call here, handled in startServer
 
 const allowedOrigins = [
   process.env.CLIENT_URL,
@@ -25,16 +24,6 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions)); // Handle preflight (OPTIONS) explicitly for all routes
 
-app.use((req, res, next) => {
-  if (req.method === "OPTIONS") {
-    res.header("Access-Control-Allow-Origin", process.env.CLIENT_URL);
-    res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    res.header("Access-Control-Allow-Credentials", "true");
-    return res.sendStatus(200);
-  }
-  next();
-});
 // Request Logger
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
