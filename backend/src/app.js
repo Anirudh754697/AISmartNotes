@@ -22,7 +22,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Handle preflight (OPTIONS) explicitly for all routes
+app.options(/.*/, cors(corsOptions)); // Handle preflight (OPTIONS) explicitly for all routes (Express 5 syntax)
 
 // Request Logger
 app.use((req, res, next) => {
