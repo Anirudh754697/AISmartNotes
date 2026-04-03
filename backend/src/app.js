@@ -13,16 +13,22 @@ const allowedOrigins = [
   'http://127.0.0.1:5173'
 ].filter(Boolean);
 
-const corsOptions = {
-  origin: allowedOrigins,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-  optionsSuccessStatus: 200
-};
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin) || !process.env.CLIENT_URL) {
+    res.setHeader('Access-Control-Allow-Origin', origin || allowedOrigins[1] || '*');
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
 
-app.use(cors(corsOptions));
-app.options(/.*/, cors(corsOptions)); // Handle preflight (OPTIONS) explicitly for all routes (Express 5 syntax)
+  // Intercept and immediately end preflight OPTIONS requests with 200 OK
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  next();
+});
 
 // Request Logger
 app.use((req, res, next) => {
