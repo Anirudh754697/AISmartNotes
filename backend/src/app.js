@@ -8,15 +8,22 @@ const app = express();
 // Connect DB
 connectDB();
 
-// Middleware
-app.use(cors({
-  origin: [
-    process.env.CLIENT_URL || 'http://localhost:5173',
-    'http://127.0.0.1:5173',
-    'http://localhost:5173'
-  ],
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'http://localhost:5173',
+  'http://127.0.0.1:5173'
+].filter(Boolean);
+
+const corsOptions = {
+  origin: allowedOrigins,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
-}));
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Handle preflight (OPTIONS) explicitly for all routes
 
 // Request Logger
 app.use((req, res, next) => {
